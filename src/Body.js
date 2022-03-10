@@ -59,12 +59,20 @@ export default function Body() {
 			}
 		}
 	};
-	//   const saveData = () => {
-	//     localStorage.setItem("members", JSON.stringify({
-	//         listJava,
-	//         listReact,
-	//     }))
-	// }
+
+	let [listTamReact, setlistTamReact] = useState(listReact);
+	let [listTamJava, setlistTamJava] = useState(listJava);
+
+	const sapXepReact = async function () {
+		await setListReact(listReact.sort((a, b) => (a.age > b.age ? 1 : -1)));
+		setlistTamReact(listReact);
+		console.log(listReact);
+		console.log(listTamReact);
+	};
+	const sapXepJava = async function () {
+		await listJava.sort((a, b) => (a.age > b.age ? 1 : -1));
+		setlistTamJava(listJava);
+	};
 	useEffect(() => {
 		if (listJava.length === 0) {
 			alert('Lớp Java không còn sinh viên');
@@ -72,8 +80,11 @@ export default function Body() {
 		if (listReact.length === 0) {
 			alert('Lớp React không còn sinh viên');
 		}
+		setlistTamJava(listJava);
+		setlistTamReact(listReact);
+
 		//  saveData();
-	}, [listJava.length, listReact.length]);
+	}, [listJava, listReact]);
 
 	const getValueName = async (e) => {
 		await setTenMoi(e.target.value);
@@ -83,6 +94,9 @@ export default function Body() {
 	};
 	const getValueClass = (e) => {
 		setLopMoi(e.target.value);
+	};
+	const getValueInput1 = (e) => {
+		setSearchName(e.target.value);
 	};
 	const AddMember = function (e) {
 		if (lopMoi === 'react') {
@@ -165,34 +179,91 @@ export default function Body() {
 		setTuoiMoi(0);
 		setLopMoi('react');
 	};
+	const [searchName, setSearchName] = useState('');
+	const [searchName2, setSearchName2] = useState('');
+
+	const timKiemTheoTen = function (list, searchName2) {
+		setlistTamReact(list);
+		console.log(listTamReact);
+		if (searchName2 === '') {
+			listTamReact = list;
+		} else {
+			const lowercaseFilter = searchName2.toLowerCase();
+			listTamReact = list.filter((item) => {
+				return item.name.toLowerCase().includes(lowercaseFilter);
+			});
+			setlistTamReact(listTamReact);
+		}
+	};
+	const timKiemTheoTen2 = function (list, searchName2) {
+		setlistTamJava(list);
+		if (searchName2 === '') {
+			listTamJava = list;
+		} else {
+			const lowercaseFilter = searchName2.toLowerCase();
+			listTamJava = list.filter((item) => {
+				return item.name.toLowerCase().includes(lowercaseFilter);
+			});
+			setlistTamJava(listTamJava);
+		}
+	};
+
 	return (
 		<div>
 			<h2>list member of React class</h2>
-			{listReact.length > 0 ? (
+			<div className='timKiem'>
+				Tìm kiếm:{' '}
+				<input
+					type='text'
+					id='timKiemTheoTen'
+					value={searchName}
+					placeholder='Tim kiem theo ten'
+					onChange={getValueInput1}
+				/>
+				<input
+					type='button'
+					value='Tim Kiem'
+					onClick={() => {
+						timKiemTheoTen(listReact, searchName);
+					}}
+				/>
+			</div>
+			<div className='sapXep'>
+				<button
+					onClick={() => {
+						sapXepReact();
+					}}>
+					Sắp Xếp Theo Tuổi
+				</button>
+			</div>
+
+			{listTamReact.length > 0 ? (
 				<ul>
-					{listReact.map((item, index) => {
+					{listTamReact.map((item, index) => {
 						return (
-							<li key={index}>
-								name: {item.name} - age: {item.age}
-								<button
-									onClick={() => {
-										tranferItem(item.name, item.age, item.type);
-									}}>
-									Tranfer
-								</button>
-								<button
-									onClick={() => {
-										FillData(item.name, item.age, item.type);
-									}}>
-									Edit
-								</button>
-								<button
-									onClick={() => {
-										UpdateData(index, item.type);
-									}}>
-									Update User
-								</button>
-							</li>
+							<div>
+								<li key={index}>
+									name: {item.name} - age: {item.age}
+									<button
+										onClick={() => {
+											tranferItem(item.name, item.age, item.type);
+										}}>
+										Tranfer
+									</button>
+									<button
+										onClick={() => {
+											FillData(item.name, item.age, item.type);
+										}}>
+										Edit
+									</button>
+									<button
+										onClick={() => {
+											UpdateData(index, item.type);
+										}}>
+										Update User
+									</button>
+								</li>
+							</div>
 						);
 					})}
 				</ul>
@@ -201,9 +272,29 @@ export default function Body() {
 			)}
 
 			<h2>list member of Java class</h2>
-			{listJava.length > 0 ? (
+			<div className='timKiem'>
+				Tìm kiếm:{' '}
+				<input
+					type='text'
+					name=''
+					id=''
+					placeholder='Tim kiem theo ten'
+					onChange={(e) => setSearchName2(e.target.value)}
+				/>
+				<input
+					type='button'
+					value='Tim Kiem'
+					onClick={() => {
+						timKiemTheoTen2(listJava, searchName2);
+					}}
+				/>
+			</div>
+			<div className='sapXep'>
+				<button onClick={sapXepJava}>Sắp Xếp Theo Tuổi</button>
+			</div>
+			{listTamJava.length > 0 ? (
 				<ul>
-					{listJava.map((item, index) => {
+					{listTamJava.map((item, index) => {
 						return (
 							<li key={index}>
 								name: {item.name} - age: {item.age}
