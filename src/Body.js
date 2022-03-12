@@ -1,6 +1,6 @@
 /** @format */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 export default function Body() {
 	const [listReact, setListReact] = useState([
@@ -60,32 +60,6 @@ export default function Body() {
 		}
 	};
 
-	let [listTamReact, setlistTamReact] = useState(listReact);
-	let [listTamJava, setlistTamJava] = useState(listJava);
-
-	const sapXepReact = async function () {
-		await setListReact(listReact.sort((a, b) => (a.age > b.age ? 1 : -1)));
-		setlistTamReact(listReact);
-		console.log(listReact);
-		console.log(listTamReact);
-	};
-	const sapXepJava = async function () {
-		await listJava.sort((a, b) => (a.age > b.age ? 1 : -1));
-		setlistTamJava(listJava);
-	};
-	useEffect(() => {
-		if (listJava.length === 0) {
-			alert('Lớp Java không còn sinh viên');
-		}
-		if (listReact.length === 0) {
-			alert('Lớp React không còn sinh viên');
-		}
-		setlistTamJava(listJava);
-		setlistTamReact(listReact);
-
-		//  saveData();
-	}, [listJava, listReact]);
-
 	const getValueName = async (e) => {
 		await setTenMoi(e.target.value);
 	};
@@ -95,9 +69,7 @@ export default function Body() {
 	const getValueClass = (e) => {
 		setLopMoi(e.target.value);
 	};
-	const getValueInput1 = (e) => {
-		setSearchName(e.target.value);
-	};
+
 	const AddMember = function (e) {
 		if (lopMoi === 'react') {
 			const react = {
@@ -119,11 +91,13 @@ export default function Body() {
 		setTuoiMoi(0);
 		setLopMoi('react');
 	};
+	const inputFocusRef = useRef();
 	const FillData = function (ten, tuoi, lop) {
 		document.getElementById('Add_Update').innerHTML = 'Cập nhật User';
 		setTenMoi(ten);
 		setTuoiMoi(tuoi);
 		setLopMoi(lop);
+		inputFocusRef.current.focus();
 	};
 	const UpdateData = function (index, lop) {
 		document.getElementById('Add_Update').innerHTML = 'Thêm User';
@@ -179,35 +153,105 @@ export default function Body() {
 		setTuoiMoi(0);
 		setLopMoi('react');
 	};
-	const [searchName, setSearchName] = useState('');
-	const [searchName2, setSearchName2] = useState('');
-
-	const timKiemTheoTen = function (list, searchName2) {
-		setlistTamReact(list);
-		console.log(listTamReact);
-		if (searchName2 === '') {
-			listTamReact = list;
+	const SORT = {
+		up: 2,
+		down: 3,
+		no: 1,
+	};
+	const [sortAge, setSortAge] = useState(SORT.up);
+	const getSortAge = () => {
+		if (sortAge === SORT.no) {
+			return 'NO';
+		}
+		if (sortAge === SORT.up) {
+			return 'UP';
+		}
+		return 'DOWN';
+	};
+	const handleSort = () => {
+		if (sortAge === SORT.down) {
+			setSortAge(SORT.no);
 		} else {
-			const lowercaseFilter = searchName2.toLowerCase();
-			listTamReact = list.filter((item) => {
-				return item.name.toLowerCase().includes(lowercaseFilter);
-			});
-			setlistTamReact(listTamReact);
+			if (sortAge === SORT.no) {
+				setSortAge(SORT.up);
+			} else {
+				if (sortAge === SORT.up) {
+					setSortAge(SORT.down);
+				}
+			}
 		}
 	};
-	const timKiemTheoTen2 = function (list, searchName2) {
-		setlistTamJava(list);
-		if (searchName2 === '') {
-			listTamJava = list;
-		} else {
-			const lowercaseFilter = searchName2.toLowerCase();
-			listTamJava = list.filter((item) => {
-				return item.name.toLowerCase().includes(lowercaseFilter);
+
+	const [searchName, setSearchName] = useState();
+	const [searchName2, setSearchName2] = useState();
+	const findName = function (list) {
+		console.log('getting user: ', list);
+		let res = [...list];
+		if (searchName) {
+			res = res.filter((el) => el.name.includes(searchName));
+		}
+		if (sortAge !== SORT.NO) {
+			res.sort((a, b) => {
+				if (sortAge === SORT.up) {
+					return parseInt(a.age) - parseInt(b.age);
+				}
+				if (sortAge === SORT.down) {
+					return parseInt(b.age) - parseInt(a.age);
+				}
 			});
-			setlistTamJava(listTamJava);
+		}
+		return res;
+	};
+	const findName2 = function (list) {
+		let res2 = [...list];
+		if (searchName2) {
+			res2 = res2.filter((el) => el.name.includes(searchName2));
+		}
+		if (sortAge !== SORT.NO) {
+			res2.sort((a, b) => {
+				if (sortAge === SORT.up) {
+					return parseInt(a.age) - parseInt(b.age);
+				}
+				if (sortAge === SORT.down) {
+					return parseInt(b.age) - parseInt(a.age);
+				}
+			});
+		}
+		return res2;
+	};
+	const reactMemberMeno = useMemo(
+		() => findName(listReact),
+		[listReact.length],
+	);
+	const javaMemberMeno = useMemo(() => findName2(listJava), [listJava.length]);
+	const XoaUser = (list, ten, lop) => {
+		if (lop === 'react') {
+			for (let i = 0; i < list.length; i++) {
+				if (list[i].name === ten) {
+					list.splice(i, 1);
+					console.log(list);
+				}
+			}
+			setListReact([...listReact]);
+		} else {
+			for (let i = 0; i < list.length; i++) {
+				if (list[i].name === ten) {
+					list.splice(i, 1);
+					console.log(list);
+				}
+			}
+			setListJava([...listJava]);
 		}
 	};
-
+	useEffect(() => {
+		if (listJava.length === 0) {
+			alert('Lớp Java không còn sinh viên');
+		}
+		if (listReact.length === 0) {
+			alert('Lớp React không còn sinh viên');
+		}
+		//  saveData();
+	}, [listJava.length, listReact.length]);
 	return (
 		<div>
 			<h2>list member of React class</h2>
@@ -218,28 +262,20 @@ export default function Body() {
 					id='timKiemTheoTen'
 					value={searchName}
 					placeholder='Tim kiem theo ten'
-					onChange={getValueInput1}
-				/>
-				<input
-					type='button'
-					value='Tim Kiem'
-					onClick={() => {
-						timKiemTheoTen(listReact, searchName);
+					onChange={(e) => {
+						setSearchName(e.target.value);
 					}}
 				/>
 			</div>
 			<div className='sapXep'>
-				<button
-					onClick={() => {
-						sapXepReact();
-					}}>
-					Sắp Xếp Theo Tuổi
+				<button onClick={handleSort}>
+					Sắp Xếp Theo Tuổi {getSortAge()}
 				</button>
 			</div>
 
-			{listTamReact.length > 0 ? (
+			{listReact.length > 0 ? (
 				<ul>
-					{listTamReact.map((item, index) => {
+					{reactMemberMeno.map((item, index) => {
 						return (
 							<div>
 								<li key={index}>
@@ -262,6 +298,12 @@ export default function Body() {
 										}}>
 										Update User
 									</button>
+									<button
+										onClick={() => {
+											XoaUser(listReact, item.name, item.type);
+										}}>
+										Xóa
+									</button>
 								</li>
 							</div>
 						);
@@ -279,22 +321,18 @@ export default function Body() {
 					name=''
 					id=''
 					placeholder='Tim kiem theo ten'
+					value={searchName2}
 					onChange={(e) => setSearchName2(e.target.value)}
-				/>
-				<input
-					type='button'
-					value='Tim Kiem'
-					onClick={() => {
-						timKiemTheoTen2(listJava, searchName2);
-					}}
 				/>
 			</div>
 			<div className='sapXep'>
-				<button onClick={sapXepJava}>Sắp Xếp Theo Tuổi</button>
+				<button onClick={handleSort}>
+					Sắp Xếp Theo Tuổi: {getSortAge()}
+				</button>
 			</div>
-			{listTamJava.length > 0 ? (
+			{listJava.length > 0 ? (
 				<ul>
-					{listTamJava.map((item, index) => {
+					{javaMemberMeno.map((item, index) => {
 						return (
 							<li key={index}>
 								name: {item.name} - age: {item.age}
@@ -316,6 +354,12 @@ export default function Body() {
 									}}>
 									Update User
 								</button>
+								<button
+									onClick={() => {
+										XoaUser(listJava, item.name, item.type);
+									}}>
+									Xóa
+								</button>
 							</li>
 						);
 					})}
@@ -325,7 +369,13 @@ export default function Body() {
 			)}
 			<h2 id='Add_Update'>Thêm thành viên mới</h2>
 			<form>
-				Tên : <input type='text' value={tenMoi} onChange={getValueName} />
+				Tên :{' '}
+				<input
+					type='text'
+					value={tenMoi}
+					onChange={getValueName}
+					ref={inputFocusRef}
+				/>
 				Tuổi :{' '}
 				<input type='number' value={tuoiMoi} onChange={getValueAge} />
 				<select value={lopMoi} onChange={getValueClass}>
