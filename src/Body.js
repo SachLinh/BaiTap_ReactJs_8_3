@@ -7,25 +7,13 @@ export default function Body() {
 		{ name: 'Linh', age: 22, type: 'react' },
 		{ name: 'Huy', age: 20, type: 'react' },
 		{ name: 'Long', age: 21, type: 'react' },
-		//   () => {
-		//     const members = JSON.parse(localStorage.getItem("members"));
-		//     if (!members || !members.listReact) {
-		//         return []
-		//     }
-		//     return members.listReact
-		//   }
+
 	]);
 	const [listJava, setListJava] = useState([
 		{ name: 'Hoang', age: 22, type: 'java' },
 		{ name: 'Quan', age: 20, type: 'java' },
 		{ name: 'Phuc', age: 21, type: 'java' },
-		// () => {
-		//     const members = JSON.parse(localStorage.getItem("members"));
-		//     if (!members || !members.listJava) {
-		//         return []
-		//     }
-		//     return members.listJava
-		//   }
+
 	]);
 
 	const [tenMoi, setTenMoi] = useState('');
@@ -185,7 +173,7 @@ export default function Body() {
 	const [searchName, setSearchName] = useState();
 	const [searchName2, setSearchName2] = useState();
 	const findName = function (list) {
-		console.log('getting user: ', list);
+
 		let res = [...list];
 		if (searchName) {
 			res = res.filter((el) => el.name.includes(searchName));

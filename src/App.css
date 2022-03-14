@@ -28,3 +28,9 @@ input {
 .timKiem {
 	padding: 15px;
 }
+ul li{
+	list-style: none;
+}
+span{
+	color: red;
+}
