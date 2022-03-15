@@ -1,19 +1,17 @@
 /** @format */
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export default function Body() {
 	const [listReact, setListReact] = useState([
 		{ name: 'Linh', age: 22, type: 'react' },
 		{ name: 'Huy', age: 20, type: 'react' },
 		{ name: 'Long', age: 21, type: 'react' },
-
 	]);
 	const [listJava, setListJava] = useState([
 		{ name: 'Hoang', age: 22, type: 'java' },
 		{ name: 'Quan', age: 20, type: 'java' },
 		{ name: 'Phuc', age: 21, type: 'java' },
-
 	]);
 
 	const [tenMoi, setTenMoi] = useState('');
@@ -173,7 +171,6 @@ export default function Body() {
 	const [searchName, setSearchName] = useState();
 	const [searchName2, setSearchName2] = useState();
 	const findName = function (list) {
-
 		let res = [...list];
 		if (searchName) {
 			res = res.filter((el) => el.name.includes(searchName));
@@ -207,11 +204,7 @@ export default function Body() {
 		}
 		return res2;
 	};
-	const reactMemberMeno = useMemo(
-		() => findName(listReact),
-		[listReact.length],
-	);
-	const javaMemberMeno = useMemo(() => findName2(listJava), [listJava.length]);
+
 	const XoaUser = (list, ten, lop) => {
 		if (lop === 'react') {
 			for (let i = 0; i < list.length; i++) {
@@ -263,7 +256,7 @@ export default function Body() {
 
 			{listReact.length > 0 ? (
 				<ul>
-					{reactMemberMeno.map((item, index) => {
+					{findName(listReact).map((item, index) => {
 						return (
 							<div>
 								<li key={index}>
@@ -320,7 +313,7 @@ export default function Body() {
 			</div>
 			{listJava.length > 0 ? (
 				<ul>
-					{javaMemberMeno.map((item, index) => {
+					{findName2(listJava).map((item, index) => {
 						return (
 							<li key={index}>
 								name: {item.name} - age: {item.age}
